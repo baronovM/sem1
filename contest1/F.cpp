@@ -34,6 +34,23 @@ int QuickSelect(std::vector<int>::iterator begin,
   return pivot;
 }
 
+void InitializeArray(std::vector<int>& arr, int size, int first, int second) {
+  arr[0] = first;
+  arr[1] = second;
+
+  // :)
+  const int kMagicNumberForFormula1 = 123;
+  const int kMagicNumberForFormula2 = 45;
+  const int kMagicNumberForFormula3 = 10000000;
+  const int kMagicNumberForFormula4 = 4321;
+
+  for (int i = 2; i < size; ++i) {
+    arr[i] = (arr[i - 1] * kMagicNumberForFormula1 +
+      arr[i - 2] * kMagicNumberForFormula2) %
+      (kMagicNumberForFormula3 + kMagicNumberForFormula4);
+  }
+}
+
 int main() {
   int sequence_size;
   std::cin >> sequence_size;
@@ -44,20 +61,8 @@ int main() {
   int second_elem;
   std::cin >> second_elem;
   std::vector<int> arr(sequence_size);
-  arr[0] = first_elem;
-  arr[1] = second_elem;
-
-  // :)
-  const int kMagicNumberForFormula1 = 123;
-  const int kMagicNumberForFormula2 = 45;
-  const int kMagicNumberForFormula3 = 10000000;
-  const int kMagicNumberForFormula4 = 4321;
-
-  for (int i = 2; i < sequence_size; ++i) {
-    arr[i] = (arr[i - 1] * kMagicNumberForFormula1 +
-              arr[i - 2] * kMagicNumberForFormula2) %
-             (kMagicNumberForFormula3 + kMagicNumberForFormula4);
-  }
+  
+  InitializeArray(arr, sequence_size, first_elem, second_elem);
 
   std::cout << QuickSelect(arr.begin(), arr.end(), k_ordstat);
 
