@@ -2,11 +2,55 @@
 #include <iostream>
 #include <string>
 
+class Hat {
+ public:
+  void Enqueue(int iq) {
+    que_.push_back(iq);
+    while (!mins_.empty() && mins_.back() > iq) {
+      mins_.pop_back();
+    }
+    mins_.push_back(iq);
+  }
+  int Dequeue() {
+    if (que_.empty()) {
+      return 0;
+    }
+    int res = que_.front();
+    if (mins_.front() == que_.front()) {
+      mins_.pop_front();
+    }
+    que_.pop_front();
+    return res;
+  }
+  int Front() {
+    if (que_.empty()) {
+      return 0;
+    }
+    return que_.front();
+  }
+  int Size() {
+    return que_.size();
+  }
+  void Clear() {
+    que_.clear();
+    mins_.clear();
+  }
+  int Min() {
+    if (mins_.empty()) {
+      return 0;
+    }
+    return mins_.front();
+  }
+
+ private:
+  std::deque<int> que_;
+  std::deque<int> mins_;
+};
+
 int main() {
   int requests_num;
   std::cin >> requests_num;
-  std::deque<int> que;
-  std::deque<int> mins;
+  Hat hat;
   std::string cmd;
   int iq;
   while (requests_num-- > 0) {
@@ -14,46 +58,36 @@ int main() {
 
     if (cmd == "enqueue") {
       std::cin >> iq;
-      que.push_back(iq);
-      while (!mins.empty() && mins.back() > iq) {
-        mins.pop_back();
-      }
-      mins.push_back(iq);
+      hat.Enqueue(iq);
       std::cout << "ok\n";
 
     } else if (cmd == "dequeue") {
-      if (que.empty()) {
+      int res = hat.Dequeue();
+      if (res == 0) {
         std::cout << "error\n";
-        continue;
+      } else {
+        std::cout << res << '\n';
       }
-      std::cout << que.front() << '\n';
-      if (mins.front() == que.front()) {
-        mins.pop_front();
-      }
-      que.pop_front();
-
     } else if (cmd == "front") {
-      if (que.empty()) {
+      int res = hat.Front();
+      if (res == 0) {
         std::cout << "error\n";
-        continue;
+      } else {
+        std::cout << res << '\n';
       }
-      std::cout << que.front() << '\n';
-
     } else if (cmd == "size") {
-      std::cout << que.size() << '\n';
-
+      std::cout << hat.Size() << '\n';
     } else if (cmd == "clear") {
-      que.clear();
-      mins.clear();
+      hat.Clear();
       std::cout << "ok\n";
     }
-
     else if (cmd == "min") {
-      if (mins.empty()) {
+      int res = hat.Min();
+      if (res == 0) {
         std::cout << "error\n";
-        continue;
+      } else {
+        std::cout << res << '\n';
       }
-      std::cout << mins.front() << '\n';
     }
   }
 
