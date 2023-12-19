@@ -1,13 +1,32 @@
 #include <iostream>
 #include <vector>
 
-struct BinaryHeap {
- private:
-  int size_ = 0;
-  std::vector<long long> data_;
-  std::vector<int> id_by_index_;
-  std::vector<int> index_by_id_;
+class BinaryHeap {
+public:
+  void ResIds(int number) { index_by_id_.resize(number); }
 
+  void Insert(long long value, int id) {
+    data_.push_back(value);
+    id_by_index_.push_back(id);
+    index_by_id_[id] = size_++;
+    SiftUp(size_ - 1);
+  }
+
+  long long GetMin() { return data_[0]; }
+
+  void ExtractMin() {
+    SwapElements(0, --size_);
+    data_.pop_back();
+    id_by_index_.pop_back();
+    SiftDown(0);
+  }
+
+  void DecreaseKey(int id, long long delta) {
+    data_[index_by_id_[id]] -= delta;
+    SiftUp(index_by_id_[id]);
+  }
+
+ private:
   void SwapElements(int ind1, int ind2) {
     std::swap(data_[ind1], data_[ind2]);
     std::swap(index_by_id_[id_by_index_[ind1]],
@@ -36,29 +55,10 @@ struct BinaryHeap {
     }
   }
 
- public:
-  void ResIds(int number) { index_by_id_.resize(number); }
-
-  void Insert(long long value, int id) {
-    data_.push_back(value);
-    id_by_index_.push_back(id);
-    index_by_id_[id] = size_++;
-    SiftUp(size_ - 1);
-  }
-
-  long long GetMin() { return data_[0]; }
-
-  void ExtractMin() {
-    SwapElements(0, --size_);
-    data_.pop_back();
-    id_by_index_.pop_back();
-    SiftDown(0);
-  }
-
-  void DecreaseKey(int id, long long delta) {
-    data_[index_by_id_[id]] -= delta;
-    SiftUp(index_by_id_[id]);
-  }
+  int size_ = 0;
+  std::vector<long long> data_;
+  std::vector<int> id_by_index_;
+  std::vector<int> index_by_id_;
 };
 
 int main() {
