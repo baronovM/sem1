@@ -9,32 +9,13 @@ const TableCell kEmpty = {-1, 0};
 const TableCell kDeleted = {-2, 0};
 
 class HashTable {
-  size_t a_;
-  size_t b_;
-  size_t m_;
-  size_t size_;
-  TableCell* arr_;
-
-  void Rehash() {
-    TableCell* temparr = new TableCell[m_];
-    std::copy(arr_, arr_ + m_, temparr);
-    size_t oldm = m_;
-    m_ <<= 1;
-    arr_ = new TableCell[m_];
-    std::fill(arr_, arr_ + m_, kEmpty);
-    for (size_t i = 0; i < oldm; ++i) {
-      if (temparr[i] != kEmpty && temparr[i] != kDeleted) {
-        Increase(temparr[i].first, temparr[i].second);
-      }
-    }
-    delete[] temparr;
-  }
-
  public:
   HashTable(size_t aa, size_t bb, size_t cap = kStartCap)
       : a_(aa), b_(bb), m_(cap << 1), size_(0), arr_(new TableCell[m_]) {
     std::fill(arr_, arr_ + m_, kEmpty);
   }
+
+  ~HashTable() { delete[] arr_; }
 
   unsigned Get(unsigned xx) const {
     size_t hs = (a_ * xx + b_) % m_;
@@ -91,7 +72,27 @@ class HashTable {
     }
   }
 
-  ~HashTable() { delete[] arr_; }
+ private:
+  void Rehash() {
+    TableCell* temparr = new TableCell[m_];
+    std::copy(arr_, arr_ + m_, temparr);
+    size_t oldm = m_;
+    m_ <<= 1;
+    arr_ = new TableCell[m_];
+    std::fill(arr_, arr_ + m_, kEmpty);
+    for (size_t i = 0; i < oldm; ++i) {
+      if (temparr[i] != kEmpty && temparr[i] != kDeleted) {
+        Increase(temparr[i].first, temparr[i].second);
+      }
+    }
+    delete[] temparr;
+  }
+  
+  size_t a_;
+  size_t b_;
+  size_t m_;
+  size_t size_;
+  TableCell* arr_;
 };
 
 int main() {
