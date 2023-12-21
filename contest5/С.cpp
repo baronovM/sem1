@@ -8,39 +8,13 @@ const std::string kEmpty = "\1";
 const std::string kDeleted = "\2";
 
 class HashTable {
-  size_t p_;
-  size_t m_;
-  std::string* arr_;
-
-  size_t hash(const std::string& str) const {
-    size_t hs = 0;
-    for (char let : str) {
-      hs *= p_;
-      hs += let;
-    }
-    return hs % m_;
-  }
-
-  /*void Rehash() {
-    std::string* temparr = new std::string[m_];
-    std::copy(arr_, arr_ + m_, temparr);
-    size_t oldm = m_;
-    m_ <<= 1;
-    arr_ = new std::string[m_];
-    std::fill(arr_, arr_ + m_, kEmpty);
-    for (size_t i = 0; i < oldm; ++i) {
-      if (temparr[i] != kEmpty && temparr[i] != kDeleted) {
-        Insert(temparr[i]);
-      }
-    }
-    delete[] temparr;
-  }*/
-
  public:
   HashTable(size_t pp, size_t cap = kStartCap)
       : p_(pp), m_(cap << 1), arr_(new std::string[m_]) {
     std::fill(arr_, arr_ + m_, kEmpty);
   }
+
+  ~HashTable() { delete[] arr_; }
 
   bool Exists(const std::string& str) const {
     size_t hs = hash(str);
@@ -62,15 +36,24 @@ class HashTable {
       size_t index = (hs + i) % m_;
       if (arr_[index] == kEmpty || arr_[index] == kDeleted) {
         arr_[index] = str;
-//        if ((++size_ << 1) >= m_) {
-//          Rehash();
-//        }
         return;
       }
     }
   }
 
-  ~HashTable() { delete[] arr_; }
+ private:
+  size_t hash(const std::string& str) const {
+    size_t hs = 0;
+    for (char let : str) {
+      hs *= p_;
+      hs += let;
+    }
+    return hs % m_;
+  }
+
+  size_t p_;
+  size_t m_;
+  std::string* arr_;
 };
 
 const int kAlphabetSize = 26;
