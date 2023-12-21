@@ -5,30 +5,13 @@ const long long kDeleted = -2;
 const size_t kStartM = 32;
 
 class HashTable {
-  size_t a_;
-  size_t b_;
-  size_t m_;
-  size_t size_;
-  long long* arr_;
-
-  void Rehash() {
-    long long* temparr = new long long[m_];
-    std::copy(arr_, arr_ + m_, temparr);
-    m_ <<= 1;
-    arr_ = new long long[m_];
-    for (size_t i = 0; i < (m_ >> 1); ++i) {
-      if (temparr[i] != kEmpty && temparr[i] != kDeleted) {
-        Insert(temparr[i]);
-      }
-    }
-    delete[] temparr;
-  }
-
  public:
   HashTable(size_t aa, size_t bb, size_t size = kStartM)
       : a_(aa), b_(bb), m_(size << 1), size_(0), arr_(new long long[m_]) {
     std::fill(arr_, arr_ + m_, kEmpty);
   }
+
+  ~HashTable() { delete[] arr_; }
 
   bool Exists(unsigned xx) {
     size_t hs = (a_ * xx + b_) % m_;
@@ -76,7 +59,25 @@ class HashTable {
     }
   }
 
-  ~HashTable() { delete[] arr_; }
+ private:
+  void Rehash() {
+    long long* temparr = new long long[m_];
+    std::copy(arr_, arr_ + m_, temparr);
+    m_ <<= 1;
+    arr_ = new long long[m_];
+    for (size_t i = 0; i < (m_ >> 1); ++i) {
+      if (temparr[i] != kEmpty && temparr[i] != kDeleted) {
+        Insert(temparr[i]);
+      }
+    }
+    delete[] temparr;
+  }
+  
+  size_t a_;
+  size_t b_;
+  size_t m_;
+  size_t size_;
+  long long* arr_;
 };
 
 int main() {
