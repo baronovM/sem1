@@ -25,37 +25,69 @@ Ord Merge(const Ord& left, const Ord& right) {
   return res;
 }
 
+
+class LogFunctor {
+ public:
+  explicit LogFunctor(size_t size) : lg(size) {
+    lg[1] = 0;
+    for (size_t i = 2; i < size + 1; ++i) {
+      lg[i] = lg[i - 1];
+      if ((i & (i - 1)) == 0) {
+        ++lg[i];
+      }
+    }
+  }
+
+  size_t operator()(size_t number) const {
+    return lg[number];
+  }
+ private:
+  std::vector<size_t> lg;
+};
+
+
+class SparseTableSecondOrd {
+ public:
+  SparseTableSecondOrd(const std::vector<int>& array)
+      : size(array.size()), log(size), sparse(log(size) + 1, std::vector<Ord>(size)) {
+    for (size_t i = 0; i < size; ++i) {
+      sparse[0][i].ford = &array[i];
+      sparse[0][i].sord = &kMaxVal;
+    }
+
+    for (size_t k = 0; k < log(size); ++k) {
+      for (size_t i = 0; i < size; ++i) {
+        size_t nx = std::min(size - 1, i + (1 << k));
+        sparse[k + 1][i] = Merge(sparse[k][i], sparse[k][nx]);
+      }
+    }
+  }
+
+  int Get(size_t left, size_t right) const {
+    size_t lglr = log(right - left + 1);
+    const Ord& first = sparse[lglr][left];
+    const Ord& second = sparse[lglr][right + 1 - (1 << lglr)];
+    return *Merge(first, second).sord;
+  }
+
+ private:
+  const size_t size;
+  const LogFunctor log;
+  std::vector<std::vector<Ord>> sparse;
+  static const int kMaxVal = 1000000001;
+};
+
 int main() {
   int sz;
   int mreqs;
   std::cin >> sz >> mreqs;
 
-  std::vector<int> lg(sz + 1);
-  lg[1] = 0;
-  for (int i = 2; i < sz + 1; ++i) {
-    lg[i] = lg[i - 1];
-    if ((i & (i - 1)) == 0) {
-      ++lg[i];
-    }
-  }
-
   std::vector<int> arr(sz);
   for (int i = 0; i < sz; ++i) {
     std::cin >> arr[i];
   }
-  std::vector<std::vector<Ord>> sparse(lg[sz] + 1, std::vector<Ord>(sz));
-  const int kMaxVal = 1000000001;
-  for (int i = 0; i < sz; ++i) {
-    sparse[0][i].ford = &arr[i];
-    sparse[0][i].sord = &kMaxVal;
-  }
 
-  for (int k = 0; k < lg[sz]; ++k) {
-    for (int i = 0; i < sz; ++i) {
-      int nx = std::min(sz - 1, i + (1 << k));
-      sparse[k + 1][i] = Merge(sparse[k][i], sparse[k][nx]);
-    }
-  }
+  SparseTableSecondOrd table(arr);
 
   while (mreqs-- > 0) {
     int left;
@@ -63,9 +95,6 @@ int main() {
     std::cin >> left >> right;
     --left;
     --right;
-    int lglr = lg[right - left + 1];
-    const Ord& first = sparse[lglr][left];
-    const Ord& second = sparse[lglr][right + 1 - (1 << lglr)];
-    std::cout << *Merge(first, second).sord << '\n';
+    std::cout << table.Get(left, right) << '\n';
   }
 }
